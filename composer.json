@@ -1,0 +1,67 @@
+{
+    "name": "crazyfd/php-blade",
+    "description": "Webman 的 Laravel Blade 模板引擎（webman blade），支持 illuminate/view 10.x-13.x，含视图渲染与 blade:cache/blade:clear 命令 | Laravel Blade templating for Webman, powered by illuminate/view.",
+    "keywords": [
+        "webman",
+        "webman-blade",
+        "webman-view",
+        "blade",
+        "blade-template",
+        "laravel",
+        "template",
+        "view",
+        "render",
+        "templating",
+        "illuminate-view",
+        "workerman"
+    ],
+    "homepage": "https://github.com/crazyfd/php-blade",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jens Segers",
+            "homepage": "https://jenssegers.com"
+        },
+        {
+            "name": "crazyfd"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/crazyfd/php-blade/issues",
+        "source": "https://github.com/crazyfd/php-blade"
+    },
+    "require": {
+        "php": ">=8.1",
+        "illuminate/view": "^10.0 || ^11.0 || ^12.0 || ^13.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5 || ^11.0",
+        "symfony/console": "^5.4 || ^6.0 || ^7.0 || ^8.0",
+        "workerman/webman-framework": "^2.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jenssegers\\Blade\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Jenssegers\\Blade\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "php -d auto_prepend_file=tests/prepend.php vendor/bin/phpunit"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "suggest": {
+        "workerman/webman-framework": "For the Webman view handler.",
+        "webman/console": "To register blade:cache and blade:clear in Webman."
+    }
+}
