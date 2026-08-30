@@ -2,6 +2,20 @@
 
 本项目所有重要变更都会记录在此文件中。
 
+## [2.1.2] - 2026-08-30
+
+### Fixed
+
+- 修复与 webman/validation 的 Facade 冲突：Blade 实例化时会抢占 `Facade::setFacadeApplication()`，
+  其私有容器未绑定 `validator`，导致 `Validator::make()`、`ValidationException::withMessages()` 等
+  Facade 调用抛 `Target class [validator] does not exist`。现在 `View::render()` 与 `blade:cache`
+  创建每个 Blade 实例后会调用 `View::ensureFacadeServices()` 向其容器补绑 `validator`
+  （检测到 webman/validation 存在时才生效，独立使用不受影响）
+
+### Added
+
+- `Blade::getContainer()` 访问器：暴露底层容器，宿主框架可据此补绑 Facade 服务
+
 ## [2.1.0] - 2026-08-28
 
 ### Added

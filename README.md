@@ -176,6 +176,9 @@ $blade->addNamespace('namespace', $path);   // 命名空间视图
 
 - 支持 illuminate/view 13.x（官方尚未发布支持）
 - 修复 `ViewServiceProvider` 中 `DynamicComponent` 未导入导致 dynamic-component 注册到不存在类的 bug
+- 修复与 webman/validation 的 Facade 冲突：Blade 抢注 `Facade::setFacadeApplication()` 后，
+  `Validator::make()` / `ValidationException::withMessages()` 会抛 `Target class [validator] does not exist`；
+  现在会在每个 Blade 实例创建后自动向其容器补绑 `validator`（`View::ensureFacadeServices()`）
 - BladeCompiler 构造参数与 Laravel 13 对齐（支持 `view.cache` / `view.compiled_extension` / `view.check_cache_timestamps` 配置）
 - PHP 8.1+ 原生类型声明
 - 完整测试覆盖（渲染、指令、组件、Webman 集成层、跨 illuminate 版本矩阵）

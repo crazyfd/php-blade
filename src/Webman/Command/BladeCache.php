@@ -24,6 +24,7 @@ class BladeCache extends Command
 
         foreach ($this->viewPaths() as $viewPath) {
             $blade = new Blade($viewPath, $config['cache_path'], null, $config['options']);
+            View::ensureFacadeServices($blade);
 
             // Apply the same custom directives/extension callbacks the runtime
             // view handler applies, so pre-compiled output matches runtime.

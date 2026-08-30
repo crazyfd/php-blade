@@ -7,6 +7,9 @@ namespace Jenssegers\Blade\Tests;
 use Jenssegers\Blade\Webman\Command\BladeCache;
 use Jenssegers\Blade\Webman\Command\BladeClear;
 use Jenssegers\Blade\Webman\View;
+use Jenssegers\Blade\Blade as BladeView;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -185,5 +188,54 @@ PHP;
             $ref->getFileName(),
             'webman view() helper should take precedence'
         );
+    }
+
+    public function test_blade_hijacks_facade_root_and_validator_gets_rebound(): void
+    {
+        require_once __DIR__ . '/stubs/WebmanValidationFactory.php';
+
+        $previousApp = Facade::getFacadeApplication();
+        Facade::clearResolvedInstances();
+
+        try {
+            $blade = new BladeView(
+                $this->basePath . '/app/view',
+                $this->basePath . '/runtime/viewcache'
+            );
+
+            // 实例化即抢注 Facade 根
+            $this->assertSame($blade->getContainer(), Facade::getFacadeApplication());
+
+            // 抢注后 validator Facade 解析失败（Blade 容器未绑定该服务）
+            $failed = false;
+            try {
+                Validator::make([], []);
+            } catch (\Throwable $e) {
+                $failed = true;
+                $this->assertStringContainsString('Target class [validator] does not exist', $e->getMessage());
+            }
+            $this->assertTrue($failed, 'Validator facade should fail on the bare blade container');
+
+            // 补绑后：容器与 Facade 根均能解析出同一个 validator 实例
+            View::ensureFacadeServices($blade);
+
+            $this->assertTrue($blade->getContainer()->bound('validator'));
+            $this->assertSame(
+                \Webman\Validation\Factory\ValidationFactory::getFactory(),
+                $blade->getContainer()->make('validator')
+            );
+            $this->assertSame(
+                \Webman\Validation\Factory\ValidationFactory::getFactory(),
+                Validator::getFacadeRoot()
+            );
+
+            // 重复补绑是幂等的，不会覆盖已有绑定
+            $blade->getContainer()->instance('validator', new \stdClass());
+            View::ensureFacadeServices($blade);
+            $this->assertInstanceOf(\stdClass::class, $blade->getContainer()->make('validator'));
+        } finally {
+            Facade::clearResolvedInstances();
+            Facade::setFacadeApplication($previousApp);
+        }
     }
 }

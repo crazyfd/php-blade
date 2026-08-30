@@ -56,6 +56,18 @@ class Blade implements FactoryContract
         return $this->compiler;
     }
 
+    /**
+     * Get the underlying container instance.
+     *
+     * Blade installs this container as the global facade root, so hosts can
+     * use it to re-bind framework services (e.g. "validator") that Blade's
+     * minimal container does not provide.
+     */
+    public function getContainer(): ContainerInterface
+    {
+        return $this->container;
+    }
+
     public function directive(string $name, callable $handler)
     {
         $this->compiler->directive($name, $handler);
